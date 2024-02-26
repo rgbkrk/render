@@ -3,6 +3,9 @@
 # SPDX-License-Identifier: MIT
 
 from .models import View, AutoView, __doc__
-from .decorators import view, auto_update
+from .decorators import renderable, auto_update
 
-__all__ = ["View", "AutoView", "view", "auto_update"]
+# Use the doc from the models setup
+__doc__ = __doc__
+
+__all__ = ["View", "AutoView", "renderable", "auto_update"]

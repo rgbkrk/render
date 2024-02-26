@@ -1,5 +1,6 @@
-from typing import Callable, Union, Protocol, Any, TypeGuard
+from typing import Any, TypeGuard, Type, TypeVar
 from functools import wraps
+
 
 from spork.protocols import HTMLRepresentable, MarkdownRepresentable
 
@@ -9,7 +10,9 @@ def is_html_representable(obj: Any) -> TypeGuard[HTMLRepresentable]:
 def is_markdown_representable(obj: Any) -> TypeGuard[MarkdownRepresentable]:
     return hasattr(obj, "to_markdown") and callable(obj.to_markdown)
 
-def view(cls):
+T = TypeVar('T')
+
+def renderable(cls: Type[T]) -> Type[T]:
     """Decorate a class to make `render` functions the way to display in IPython"""
     def _repr_mimebundle_(self, include=None, exclude=None):
         # Allow the user to pass back a string of HTML, a VDOM object, or other displayable
@@ -30,7 +33,10 @@ def view(cls):
             return format
 
         raise ValueError("render() must return something displayable")
-    cls._repr_mimebundle_ = _repr_mimebundle_
+
+    setattr(cls, '_repr_mimebundle_', _repr_mimebundle_)
+
+    # WISH: I wish the resulting type could be something like `Type[T & Displayable]`
     return cls
 
 

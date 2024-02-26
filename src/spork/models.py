@@ -5,22 +5,20 @@ creation of rich, live-updating visualizations for data models, leveraging the c
 IPython's display system.
 
 Key Components:
-- HTMLRepresentable: A protocol that defines a contract for objects capable of rendering themselves
-  as HTML. This is useful for ensuring that objects passed to the display system are properly
-  formatted for visual presentation.
 
-- ViewModel: An abstract base class that serves as the foundation for creating view models. These
+- View: An abstract base class that serves as the foundation for creating view models. These
   view models are designed to encapsulate data and logic for rendering visual representations of
   that data in environments that support HTML, such as Jupyter notebooks. ViewModel provides
   mechanisms for displaying and updating these visual representations dynamically, enhancing
   interactivity and user engagement.
 
-- AutoViewModel: A concrete implementation of ViewModel that automatically updates its display
+- AutoView: A concrete implementation of ViewModel that automatically updates its display
   whenever its attributes change. This is particularly useful for creating reactive interfaces
   where changes to the underlying data model should be immediately reflected in the display
   without requiring explicit calls to update the view.
 
 Usage:
+
 The module is intended to be used in environments that support HTML rendering and IPython's
 display capabilities. Users can extend the ViewModel class to create custom view models tailored
 to their specific visualization needs, implementing the `render` method to define how data should
@@ -28,6 +26,7 @@ be represented visually. AutoViewModel can be used for more dynamic scenarios wh
 should react to changes in the view model's state automatically.
 
 Example:
+
 Below is a simplified example of how to create a custom ViewModel for displaying a message:
 
     class MessageViewModel(ViewModel):
@@ -44,21 +43,25 @@ This example creates a simple view model for displaying a message in a heading e
 notebook.
 
 Note:
+
 This module requires an environment that supports the IPython display system and HTML rendering,
 such as Jupyter notebooks. It is not intended for use in non-interactive Python scripts or
 environments that do not support these capabilities.
 """
 
-from typing import Callable, Union, Protocol, Any
-from pydantic import BaseModel, Field
-from abc import ABC, abstractmethod
-from IPython.display import display
 import uuid
 
-from spork.protocols import HTMLRepresentable, MarkdownRepresentable
-from spork.decorators import view, auto_update
+from typing import Union
+from abc import ABC, abstractmethod
 
-@view
+from spork.protocols import HTMLRepresentable, MarkdownRepresentable, Displayable
+from spork.decorators import renderable, auto_update
+
+from pydantic import BaseModel, Field
+
+from IPython.display import display
+
+@renderable
 class View(ABC, BaseModel):
     """
     An abstract base class for view models designed for displaying objects
@@ -81,7 +84,7 @@ class View(ABC, BaseModel):
     """
     display_id: str = Field(default_factory=lambda: str(uuid.uuid4()), exclude=True)
 
-    def display(self):
+    def display(self) -> None:
         """
         Display or the object in a Jupyter notebook or similar environment.
 
@@ -90,7 +93,7 @@ class View(ABC, BaseModel):
         """
         display(self, display_id=self.display_id)
 
-    def update(self):
+    def update(self) -> None:
         """
         Update the display with the current state of the object.
 
@@ -114,6 +117,7 @@ class View(ABC, BaseModel):
                                            that can render itself as HTML.
         """
         ...
+
 
 
 @auto_update
