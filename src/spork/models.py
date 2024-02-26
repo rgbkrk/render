@@ -49,20 +49,17 @@ such as Jupyter notebooks. It is not intended for use in non-interactive Python 
 environments that do not support these capabilities.
 """
 
-from typing import Callable, Union, Protocol
+from typing import Callable, Union, Protocol, Any
 from pydantic import BaseModel, Field
 from abc import ABC, abstractmethod
 from IPython.display import display
 import uuid
 
-class HTMLRepresentable(Protocol):
-    """Objects with a `to_html` method are displayable with ViewModels."""
-    def to_html(self) -> str:
-        ...
+from spork.protocols import HTMLRepresentable, MarkdownRepresentable
+from spork.decorators import view, auto_update
 
-# TODO: Detect when running in a regular Python environment and use terminal rendering
-#       instead of HTML and swap using `display_id` for \r
-class ViewModel(ABC, BaseModel):
+@view
+class View(ABC, BaseModel):
     """
     An abstract base class for view models designed for displaying objects
     within Jupyter notebooks or other environments that support HTML rendering.
@@ -102,10 +99,8 @@ class ViewModel(ABC, BaseModel):
         """
         display(self, update=True, display_id=self.display_id)
 
-    # Need to make this return a string or something with a `to_html` method
-    # so that it can be displayed in a notebook
     @abstractmethod
-    def render(self) -> Union[str, HTMLRepresentable]:
+    def render(self) -> Union[str, HTMLRepresentable, MarkdownRepresentable]:
         """
         Render the object for display.
 
@@ -120,28 +115,9 @@ class ViewModel(ABC, BaseModel):
         """
         ...
 
-    def _repr_html_(self):
-        """
-        Provide an HTML representation of the object for IPython.display.display.
 
-        This method is automatically called by the IPython display system, and
-        it uses the render method to get the content to display.
-
-        Returns:
-            str: The HTML representation of the object to be displayed.
-        """
-        # Allow the user to pass back a string of HTML or a VDOM object
-        rendered = self.render()
-
-        if isinstance(rendered, str):
-            return rendered
-        elif hasattr(rendered, "to_html"):
-            return rendered.to_html()
-
-        raise ValueError("render() must return a string or a VDOM object")
-
-
-class AutoViewModel(ViewModel):
+@auto_update
+class AutoView(View):
     """
     An extension of ViewModel that automatically updates its display whenever any of its
     attributes change. This class is designed to facilitate the creation of reactive
@@ -171,16 +147,3 @@ class AutoViewModel(ViewModel):
     AutoViewModel only triggers updates for direct attribute changes. Nested changes, such as
     modifications to items within a list attribute, may not automatically trigger an update.
     """
-    def __setattr__(self, name, value):
-        """
-        Overrides the default setattr behavior to automatically trigger an update to the
-        display whenever an attribute changes, except for 'display_id' which is managed
-        internally.
-
-        Args:
-            name (str): The name of the attribute being changed.
-            value: The new value for the attribute.
-        """
-        super().__setattr__(name, value)
-        if name != "display_id":
-            self.update()

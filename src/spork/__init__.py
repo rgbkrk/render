@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .models import ViewModel, AutoViewModel, __doc__
+from .models import View, AutoView, __doc__
+from .decorators import view, auto_update
 
-__all__ = ["ViewModel", "AutoViewModel"]
+__all__ = ["View", "AutoView", "view", "auto_update"]
