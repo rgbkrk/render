@@ -1,4 +1,4 @@
-from src.render import models
+from src.spork import models
 
 def test_view_model():
     class ChatMessage(models.ViewModel):
