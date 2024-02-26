@@ -61,6 +61,7 @@ from pydantic import BaseModel, Field
 
 from IPython.display import display
 
+
 @renderable
 class View(ABC, BaseModel):
     """
@@ -82,6 +83,7 @@ class View(ABC, BaseModel):
                   content to be displayed as either a string of HTML or an object
                   that implements the HTMLRepresentable protocol.
     """
+
     display_id: str = Field(default_factory=lambda: str(uuid.uuid4()), exclude=True)
 
     def display(self) -> None:
@@ -119,9 +121,8 @@ class View(ABC, BaseModel):
         ...
 
 
-
 @auto_update
-class AutoView(View):
+class AutoUpdate(View):
     """
     An extension of ViewModel that automatically updates its display whenever any of its
     attributes change. This class is designed to facilitate the creation of reactive
