@@ -28,6 +28,9 @@ Documentation = "https://github.com/rgbkrk/spork#readme"
 Issues = "https://github.com/rgbkrk/spork/issues"
 Source = "https://github.com/rgbkrk/spork"
 
+[tool.setuptools.package-data]
+"spork" = ["py.typed"]
+
 [tool.hatch.version]
 path = "src/spork/__about__.py"
 
