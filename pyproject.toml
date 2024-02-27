@@ -29,7 +29,7 @@ Issues = "https://github.com/rgbkrk/spork/issues"
 Source = "https://github.com/rgbkrk/spork"
 
 [tool.setuptools.package-data]
-"spork" = ["py.typed"]
+spork = ["py.typed"]
 
 [tool.hatch.version]
 path = "src/spork/__about__.py"
@@ -49,6 +49,9 @@ python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
 dependencies = ["mypy>=1.0.0"]
 [tool.hatch.envs.types.scripts]
 check = "mypy --install-types --non-interactive {args:src/spork tests}"
+
+[tool.hatch.metadata.package-data]
+spork = ["py.typed"]
 
 [tool.coverage.run]
 source_pkgs = ["spork", "tests"]
