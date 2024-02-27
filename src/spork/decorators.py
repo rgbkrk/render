@@ -1,4 +1,5 @@
-from typing import Any, Literal, TypeGuard, Type, TypeVar
+from typing import Any, Literal, Type, TypeVar
+from typing_extensions import TypeGuard
 from functools import wraps
 
 from spork.protocols import HTMLRepresentable, MarkdownRepresentable
